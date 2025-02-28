@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+#connector image (pulled from EC2)
+  connector-app:
+    image: ${DIGITECH}
+    ports:
+      - "2099:80"
+      - "1099:443"
+    depends_on:
+      - mysql
+      - redis
+      - queue
+    env_file:
+      - variables.env
+
+#codeception test container
+  tests-app:
+    build: .
+    volumes:
+      - .:/app
+    depends_on:
+      - connector-app
+
+#data base service (public image)
+  mysql:
+    restart: always
+    image: mysql:5.7
+    expose:
+      - "3306"
+    ports:
+      - "2533:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+    env_file:
+        - variables.env
+
+
+#redis service for cache memory (public image)
+  redis:
+    restart: always
+    image: redis:6.0.1
+    ports:
+    - "6090:6379"
+    expose:
+      - "6379"
+    command: [ "redis-server", "/redis.conf" ]
+    volumes:
+      - ./docker/redis.conf:/redis.conf
+
+#queue service (public image)
+  queue:
+    restart: always
+    image: bodsch/docker-beanstalkd:1.10
+    expose:
+      - "11301"
+    volumes:
+      - beanstalk:/var/lib/beanstalkd
+
+volumes:
+  mysql:
+    driver: local
+  beanstalk:
+    driver: local
