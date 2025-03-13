@@ -9,37 +9,33 @@ This project is a test framework for the Digitech connector, designed for REH tr
    git clone https://github.com/NoellaMarie501/Codeception-UAT-Connector.git
    cd Codeception-UAT-Connector
    ```
-2. Install all the dependencies
-   ```bash
-    composer install
-   ```
-3. Ensure that Docker and Docker Compose are installed on your machine.
-4. Install and configure aws
+2. Ensure that Docker and Docker Compose are installed on your machine.
+3. Install and configure aws
 ```bash
    sudo apt update && sudo apt install unzip -y
    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
    unzip awscliv2.zip
    sudo ./aws/install
    complete -C '/usr/local/bin/aws_completer' aws
-   aws configure
+   aws configure  //for add your aws key, aws secret, region and format
 ```
 
-1. Authenticate with your aws credentials:
+4. Authenticate with your aws credentials:
    ```bash
     make auth2
    ```
 
-2. Download the image of digitech connector
+5. Download the image of digitech connector
    ```bash
    make digitech-pull
    ```
 
-3. Build the Docker containers:
+6. Build the Docker containers:
    ```bash
    make build
    ```
 
-4. Start the services:
+7. Start the services:
    ```bash
    make up
    ```
