@@ -43,6 +43,6 @@ app-root:
 test-root:
 	docker exec -it -u root $$(docker-compose --project-name $(PROJECT_NAME) ps -q tests-app) /bin/bash
 execute-test:
-	docker exec -it -u root $$(docker-compose --project-name $(PROJECT_NAME) ps -q tests-app) /bin/bash  
+	docker exec -it -u root $$(docker-compose --project-name $(PROJECT_NAME) ps -q tests-app) /bin/bash -c "vendor/bin/codecept run Acceptance"  
 %:
 	@:

@@ -88,14 +88,10 @@ The project uses the following frameworks:
 
 ## Run tests
 
+
 To run the tests:
-1. Open a bash shell as root in the test container: 
 ```bash
-   make test-root
-```
-2. use the following command:
-```bash
-   vendor/bin/codecept run Acceptance 
+   make execute-test
 ```
 
 # Configuration Parameters
