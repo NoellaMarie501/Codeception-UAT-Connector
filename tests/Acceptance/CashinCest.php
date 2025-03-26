@@ -69,9 +69,9 @@ final class CashinCest
         $I->sendGET("/payment/{$uuid}");
         $I->seeResponseCodeIs(200);
         $I->seeResponseIsJson();
-        // $I->seeResponseContainsJson([
-        //     "status" => "SUCCESS"
-        // ]);
+        $I->seeResponseContainsJson([
+             "status" => "INPROGRESS"
+         ]);
     }
   
     public function checkInvalidPhoneNumber(AcceptanceTester $I)

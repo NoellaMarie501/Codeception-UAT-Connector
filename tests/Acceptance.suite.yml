@@ -8,6 +8,9 @@ modules:
     enabled:
         - PhpBrowser:
             url: http://connector-app
+        - PhpBrowser:
+            url: https://nodered.dev.maviance.info
+            name: NodeRedBrowser
         - REST: 
             depends: PhpBrowser
             part: Json
