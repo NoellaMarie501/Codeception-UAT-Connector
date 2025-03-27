@@ -70,7 +70,7 @@ final class CashinCest
         $I->seeResponseCodeIs(200);
         $I->seeResponseIsJson();
         $I->seeResponseContainsJson([
-             "status" => "INPROGRESS"
+             "status" => "SUCCESS"
          ]);
     }
   
