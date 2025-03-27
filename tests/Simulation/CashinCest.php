@@ -46,9 +46,12 @@ final class CashinCest
         ]);
         
     
-        
-        // Send request to get status
-        $I->sendGET("/payment/");
+       // Extract UUID from response
+        $response = json_decode($I->grabResponse(), true);
+        $uuid = $response['uuid'];
+       
+       // Send request to get status
+        $I->sendGET("/payment/{$uuid}");
         $I->seeResponseCodeIs(200);
         $I->seeResponseIsJson();
         $I->seeResponseContainsJson([
