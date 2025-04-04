@@ -325,5 +325,123 @@ public function checkDuplicatePTN(AcceptanceTester $I)
         "devMessage" => "A record with the same PTN already exists"
     ]);
 }
+public function checkInvalidAgentId(AcceptanceTester $I)
+{
+    $I->wantTo('Ensure error is returned for invalid agent ID');
+
+    // Send cashin request with invalid agent ID
+    $I->haveHttpHeader('x-api-version', 'v1');
+    $I->haveHttpHeader('Content-Type', 'application/json');
+    $I->haveHttpHeader('x-api-key', 'TESTKEY');
+    $I->sendPOST('/cashin/pay', [
+        "service" => "MOMO_CASHIN",
+        "callbackUrl" => "http://localhost",
+        "destination" => "075215268",
+        "ptn" => "517855879",
+        "amount" => "100",
+        "agent" => [
+            "agentId" => "", // Invalid agent ID
+            "agentName" => "noella",
+            "ccName" => "marie",
+            "ccId" => "noe778"
+        ]
+    ]);
+
+    // Check error response
+    $I->seeResponseCodeIs(400); 
+    $I->seeResponseIsJson();
+    $I->seeResponseContainsJson([
+        "code" => 703100,
+        "message" => 'agent.agentId is required and must be valid',
+        "devMessage" => 'agent.agentId is required and must be valid'
+    ]);
+}
+
+public function checkInsufficientBalance(AcceptanceTester $I)
+{
+    $I->wantTo('Ensure error is returned for insufficient balance');
+
+    $I->sendPOST('/cashin/pay', [
+       
+    ]);
+
+    $I->seeResponseCodeIs(400);
+    $I->seeResponseIsJson();
+    $I->seeResponseContainsJson([
+        "error_code" => "SP0016",
+        "error" => "insufficient_balance",
+        "error_description" => "Votre solde est insuffisant pour cette opération"
+    ]);
+}
+
+public function checkMissingPayeeMsisdn(AcceptanceTester $I)
+{
+    $I->wantTo('Ensure error is returned when payee_msisdn is missing');
+
+    $I->sendPOST('/cashin/pay', [
+        "payout" => [
+            "amount" => 100,
+            "payee_msisdn" => "", // field is empty
+            "api_id" => "valid_api_id",
+            "api_secret" => "valid_api_secret"
+        ]
+    ]);
+
+    $I->seeResponseCodeIs(400);
+    $I->seeResponseIsJson();
+    $I->seeResponseContainsJson([
+        "error_code" => "SP0009",
+        "error" => "invalid_request",
+        "error_description" => "missing required field payee_msisdn in payout data"
+    ]);
+}
+
+public function checkInvalidPayeeMsisdnFormat(AcceptanceTester $I)
+{
+    $I->wantTo('Ensure error is returned for invalid payee_msisdn format');
+
+    $I->sendPOST('/cashin/pay', [
+        "payout" => [
+            "amount" => 100,
+            "payee_msisdn" => "12345678", // Invalid format
+            "api_id" => "valid_api_id",
+            "api_secret" => "valid_api_secret"
+        ]
+    ]);
+
+    $I->seeResponseCodeIs(400);
+    $I->seeResponseIsJson();
+    $I->seeResponseContainsJson([
+        "error_code" => "SP0009",
+        "error" => "invalid_request",
+        "error_description" => "invalid Msisdn Length. Msisdn Length should be 9 and should start with 0"
+    ]);
+}
+
+public function checkMissingApiCredentials(AcceptanceTester $I)
+{
+    $I->wantTo('Ensure error is returned when API credentials are missing');
+
+    $I->sendPOST('/cashin/pay', [
+        "payout" => [
+            "amount" => 100,
+            "payee_msisdn" => "075215268"
+        ]
+    ]);
+
+    $I->seeResponseCodeIs(400);
+    $I->seeResponseIsJson();
+    $I->seeResponseContainsJson([
+        "error_code" => "SP0003",
+        "error" => "invalid_grant",
+        "error_description" => "Api Id or Api Secret is invalid or revoked"
+    ]);
+}
+
+
+
 }
 ?>
+
+
+

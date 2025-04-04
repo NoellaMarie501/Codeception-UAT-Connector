@@ -314,6 +314,87 @@ public function checkMissingCallbackUrl(AcceptanceTester $I)
         "devMessage" => "callbackUrl is required,Valid callbackUrl is required"
     ]);
 }
+public function checkMissingEBillField(AcceptanceTester $I)
+{
+    $I->wantTo('Ensure error is returned when e_bill field is missing');
+
+    $I->sendPOST('/cashout/pay', [
+        // e_bill field is missing
+    ]);
+
+    $I->seeResponseCodeIs(400);
+    $I->seeResponseIsJson();
+    $I->seeResponseContainsJson([
+        "error" => "invalid_request",
+        "error_description" => "Le champ e_bill est manquant dans la requête",
+        "http_status" => 400
+    ]);
+}
+public function checkMissingPayerMsisdn(AcceptanceTester $I)
+{
+    $I->wantTo('Ensure error is returned when payer_msisdn is missing or empty');
+
+    $I->sendPOST('/cashout/pay', [
+        "e_bill" => [
+            "payer_msisdn" => "", // Missing or empty
+            "bill_id" => "12345",
+            "state" => "payable"
+        ]
+    ]);
+
+    $I->seeResponseCodeIs(422);
+    $I->seeResponseIsJson();
+    $I->seeResponseContainsJson([
+        "client_transaction_id" => "00000014",
+        "server_transaction_id" => "0000000156665",
+        "message" => "The request is not processable",
+        "errors" => [
+            "payer_msisdn" => ["can't be blank"]
+        ]
+    ]);
+}
+public function checkInvalidBillId(AcceptanceTester $I)
+{
+    $I->wantTo('Ensure error is returned when bill_id is invalid');
+
+    $I->sendPOST('/cashout/pay', [
+        "e_bill" => [
+            "payer_msisdn" => "075215268",
+            "bill_id" => "xxx", // Invalid bill_id
+            "state" => "payable"
+        ]
+    ]);
+
+    $I->seeResponseCodeIs(404);
+    $I->seeResponseIsJson();
+    $I->seeResponseContainsJson([
+        "message" => "La facture est introuvable"
+    ]);
+}
+
+public function checkCancelledEBill(AcceptanceTester $I)
+{
+    $I->wantTo('Ensure correct response is returned for a cancelled e_bill');
+
+    $I->sendPOST('/cashout/pay', [
+        "e_bill" => [
+            "payer_msisdn" => "077123654",
+            "bill_id" => "5550048643",
+            "state" => "cancelled" // Cancelled state
+        ]
+    ]);
+
+    $I->seeResponseCodeIs(200);
+    $I->seeResponseIsJson();
+    $I->seeResponseContainsJson([
+        "bill_id" => "5550048643",
+        "payer_msisdn" => "077123654",
+        "state" => "cancelled",
+        "amount" => 100,
+        "currency" => "XAF",
+        "reason" => "fff"
+    ]);
+}
 
 }
 
