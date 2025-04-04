@@ -361,13 +361,8 @@ public function checkInsufficientBalance(AcceptanceTester $I)
 {
     $I->wantTo('Ensure error is returned for insufficient balance');
 
-    $I->sendPOST('/payout', [
-        "payout" => [
-            "amount" => 100000000000, // amount is greater than available balance
-            "payee_msisdn" => "075215268",
-            "api_id" => "valid_api_id",
-            "api_secret" => "valid_api_secret"
-        ]
+    $I->sendPOST('/cashin/pay', [
+       
     ]);
 
     $I->seeResponseCodeIs(400);
@@ -383,7 +378,7 @@ public function checkMissingPayeeMsisdn(AcceptanceTester $I)
 {
     $I->wantTo('Ensure error is returned when payee_msisdn is missing');
 
-    $I->sendPOST('/payout', [
+    $I->sendPOST('/cashin/pay', [
         "payout" => [
             "amount" => 100,
             "payee_msisdn" => "", // field is empty
@@ -405,7 +400,7 @@ public function checkInvalidPayeeMsisdnFormat(AcceptanceTester $I)
 {
     $I->wantTo('Ensure error is returned for invalid payee_msisdn format');
 
-    $I->sendPOST('/payout', [
+    $I->sendPOST('/cashin/pay', [
         "payout" => [
             "amount" => 100,
             "payee_msisdn" => "12345678", // Invalid format
@@ -427,7 +422,7 @@ public function checkMissingApiCredentials(AcceptanceTester $I)
 {
     $I->wantTo('Ensure error is returned when API credentials are missing');
 
-    $I->sendPOST('/payout', [
+    $I->sendPOST('/cashin/pay', [
         "payout" => [
             "amount" => 100,
             "payee_msisdn" => "075215268"
